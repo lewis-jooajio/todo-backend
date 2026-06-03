@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ override: true })
 const express = require('express')
 const cors = require('cors')
 const { Pool } = require('pg')
@@ -6,9 +6,11 @@ const { Pool } = require('pg')
 const app = express()
 const PORT = process.env.PORT || 3001
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  ssl: isProduction ? { rejectUnauthorized: false } : false,
 })
 
 app.use(cors())
@@ -31,6 +33,16 @@ app.post('/todos', async (req, res) => {
     [text.trim()]
   )
   res.status(201).json(result.rows[0])
+})
+
+// GET /todos/:id - 단일 조회
+app.get('/todos/:id', async (req, res) => {
+  const id = parseInt(req.params.id)
+  const result = await pool.query('SELECT * FROM todos WHERE id = $1', [id])
+  if (result.rows.length === 0) {
+    return res.status(404).json({ error: '할 일을 찾을 수 없습니다.' })
+  }
+  res.json(result.rows[0])
 })
 
 // PUT /todos/:id - 완료 상태 토글
