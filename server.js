@@ -18,7 +18,7 @@ app.use(express.json())
 
 // GET /todos - 전체 목록 조회
 app.get('/todos', async (req, res) => {
-  const result = await pool.query('SELECT * FROM todos ORDER BY id')
+  const result = await pool.query('SELECT * FROM todos ORDER BY id DESC')
   res.json(result.rows)
 })
 
