@@ -109,7 +109,7 @@ app.get('/todos', async (req, res) => {
     SELECT todos.*, users.nickname AS author
     FROM todos
     LEFT JOIN users ON todos.user_id = users.id
-    ORDER BY todos.created_at DESC
+    ORDER BY todos.created_at DESC, todos.id DESC
   `)
   res.json(result.rows)
 })
